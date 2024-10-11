@@ -35,6 +35,3 @@ for filename in os.listdir(path):
 
 # 将列表转换为DataFrame
 df = pd.DataFrame(data, columns=['车型', '平台', '车辆底盘号', '方案号'])
-
-# 打印DataFrame
-print(df)

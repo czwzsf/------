@@ -1,3 +1,4 @@
 /data/
 # 排除.xlsx
 *.xlsx
+/result/
