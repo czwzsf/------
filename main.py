@@ -1,21 +1,32 @@
 import os
 import pandas as pd
-from docx import Document
+import re
+
 # 文件地址
-path = "data/Data_JH6"
-# 获取文件夹下所有文件
-files = [f for f in os.listdir(path) if f.endswith('.docx')]
-# 创建一个DataFrame
-data_name = pd.DataFrame(files, columns=["filename"])
+path = 'data/Data_JH6'
 
-# 新建一个空的DataFrame，用来存储每一个docx中的需要清洗的数据
-data_result = pd.DataFrame()
+# 初始化一个空的列表来存储文件信息
+data = []
 
-# 读取每一个docx文件
-for file in files:
-    # 读取docx文件
-    doc = Document(path + '/' + file)
-    # 打印内容
-    for para in doc.paragraphs:
-        print(para.text)
+# 遍历文件夹中的所有文件
+for filename in os.listdir(path):
+    if filename.endswith('.docx'):
+        # 使用正则表达式替换所有的文字版本的“-”为数字版本的“-”
+        filename = re.sub(r'－', '-', filename)
+        # 使用正则表达式匹配车型平台与品系和车辆底盘号与方案号
+        match = re.search(r'-(\w+)-(\w+)\((\w+)\)', filename)
+        if match:
+            # 获取车型平台与品系
+            car_model = match.group(1)
+            # 获取车辆底盘号
+            chassis_number = match.group(2)
+            # 获取方案号
+            scheme_number = match.group(3)
+            # 将信息添加到列表中
+            data.append([car_model, chassis_number, scheme_number])
 
+# 将列表转换为DataFrame
+df = pd.DataFrame(data, columns=['车型平台与品系', '车辆底盘号', '方案号'])
+
+# 打印DataFrame
+print(df)
