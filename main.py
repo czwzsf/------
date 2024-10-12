@@ -1,11 +1,12 @@
 import os
 import re
 import pandas as pd
+from docx import Document
 
 # 文件地址
 path = 'data/Data_JH6'
 
-# 初始化一个空的列表来存储文件信息
+# 初始化一个空列表来存储文件信息
 data = []
 
 # 定义已知的车型
@@ -28,12 +29,23 @@ for filename in os.listdir(path):
                     vehicle_model = model
                     series = car_model.split(model, 1)[1]
                     break
+            # 读取Word文件内容
+            doc = Document(os.path.join(path, filename))
+            scheme_number = None
+            vin_code = None
+            for table in doc.tables:
+                for row in table.rows:
+                    for i, cell in enumerate(row.cells):
+                        if '方案号' in cell.text and i + 1 < len(row.cells):
+                            scheme_number = row.cells[i + 1].text.strip()
+                        if 'VIN码' in cell.text and i + 1 < len(row.cells):
+                            vin_code = row.cells[i + 1].text.strip()[-8:]
             # 将信息添加到列表中
-            if vehicle_model and series:
-                data.append([vehicle_model, series])
+            if vehicle_model and series and scheme_number and vin_code:
+                data.append([vehicle_model, series, scheme_number, vin_code])
 
 # 将列表转换为DataFrame
-df = pd.DataFrame(data, columns=['车型', '品系'])
+df = pd.DataFrame(data, columns=['车型', '品系', '方案号', 'VIN码'])
 
-# 打印DataFrame
-print(df)
+# 将DataFrame写入Excel文件
+df.to_excel('output.xlsx', index=False)
