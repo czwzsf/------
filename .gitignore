@@ -2,3 +2,6 @@
 # 排除.xlsx
 *.xlsx
 /result/
+/model/
+/zh_core_web_sm-3.8.0-py3-none-any.whl
+/custom_ner_model/
