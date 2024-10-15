@@ -58,9 +58,11 @@ n_iter = 100
 for i in range(n_iter):
     random.shuffle(examples)
     losses = {}
-    batches = minibatch(examples, size=compounding(4.0, 32.0, 1.001))
+    # Adjust the batch size here
+    batches = minibatch(examples, size=compounding(4.0, 256.0,
+                                                   1.00001))
     for batch in batches:
-        nlp.update(batch, drop=0.5, losses=losses)
+        nlp.update(batch, drop=0.4, losses=losses)  # drop=0.5 作用是每次训练时，随机丢弃50%的数据，防止过拟合
     print(f'Losses at iteration {i}: {losses}')
 
 # Save the model
@@ -70,8 +72,7 @@ nlp.to_disk('model')
 nlp2 = spacy.load('model')
 
 # Test with a sample configuration detail text
-test_text = '整车，潍柴WP14T610E62发动机（12万公里长换油），A+D悬置，120A发电机，电控硅油高置风扇，平行流中冷器，Ф430法雷奥离合器，陕齿F16JZ28A变速箱（铝壳，AMT），液力缓速器，DY020前轴（FAG免维护轮端），蓬翔440桥（速比2.687，FAG免维护轮端，轮间差速锁），前盘后鼓，12R22.5 18PR轮胎，前铝合金、后轻量化钢圈，国际优秀品牌轮胎，车架宽前940mm后800mm，纵梁断面280*80*9mm，轴距（3450+1350）mm，725L+300L铝油箱，带水加热，带水寒宝,100L尿素箱（集成），BOSCH-ECO转向机，ABS+ESC+LDWS+FCW（KNORR)，制动压力12.5bar，VOSS接头，前桥带横向稳定杆，前1880单片簧，后两片簧，V杆螺栓采用鹰途方案，立式电瓶框，220Ah蓄电池，JH6平地板大排半高顶驾驶室（后悬置后移），电动天窗，行车空调，电动加热一体式后视镜，电动门窗，带导流罩及侧翼板，格拉默座椅，驾驶室四点气囊悬置，220V电源，1KW逆变器，2000多功能方向盘（真皮包裹），旋钮开关+组合开关，PKC线束，青汽4G车联网，手电一体液压举升装置，视频包（10寸屏+四方位），家居包2.0，彩色液晶仪表，内外饰色彩优化，LED大灯，转向辅助照明，LED昼行灯，LED示廓灯，国六标贴，国六在线检测终端，智尊版，基本款，约斯特90#牵引盘。机箱桥长换油，12/20/10万公里，限速89km/h。'
-
+test_text = '牵引,锡柴CA6SM4A51E61N,一汽CA12TAX260A(自动挡全铝壳),萨克斯Ф430,DY011前轴(盘式制动),435升级冲焊桥(带轮间差速锁/速比3.7/鼓式制动),300*80*8,JH6凸地板大排半高顶驾驶室(四点空气悬置/空调/电动举升/电动门窗/电动电加热后视镜),12R22.5-18PR(全车EA111轻量化钢圈),3800+1350,智行版,视频包2.0(10寸基本屏+四方位影像),视频记录仪,2000多功能方向盘,通风座椅,220V电源,自动大灯控制机构,板簧2/3,LNG-1350L*1个,碳钢气瓶框架,永磁同步电机80kW/130kW,锰酸锂电池(15kWh/C箱),180Ah蓄电池,带静电拖地带,进口阀,全车FAG轮端,机箱长换油,10/15/6万公里,PKC线束,限速89KM/H,国产EPB,ABS/ESC/FCW/LDWS,混合动力车,试制,375/1800,378KW,90牵引盘'
 doc = nlp2(test_text)
 
 # Extract and print the recognized entities
