@@ -55,5 +55,5 @@ nlp2 = spacy.load('model')
 test_text = '牵引,潍柴WP13NG540E60,陕齿F12JZ26A(自动挡全铝壳)+液力缓速器,EATONФ430,DY011前轴(盘式制动),435升级冲焊桥(带轮间差速锁/速比3.417/鼓式制动),300*80*8,JH6凸地板大排半高顶驾驶室(四点空气悬置/空调/电动举升/电动门窗/电动电加热后视镜),12R22.5-18PR(全车EA111轻量化钢圈),3800+1350,TS,智行版,北方款(独立暖风+电加热座椅),视频包2.0(10寸基本屏+四方位影像),内外饰色彩优化,视频记录仪,2000多功能方向盘,通风座椅,220V电源,自动大灯控制机构,板簧2/2,LNG-1350L*1个,DQ-2,碳钢气瓶框架,220Ah蓄电池,带静电拖地带,进口阀,全车FAG轮端,变速箱长换油,6/20/6万公里,限速89KM/H,ABS/ESC/FCW/LDWS,试制,392/1900,397KW,90牵引盘'
 doc = nlp2(test_text)
 
-# Print the predicted categories
-print(doc.cats)
+# Assuming the model has labeled the text correctly, you can extract the engine name from the doc object
+print(doc.ents)
