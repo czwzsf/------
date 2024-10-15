@@ -49,5 +49,31 @@ for filename in os.listdir(path):
 # Convert the list to a DataFrame
 df = pd.DataFrame(data, columns=['车型', '品系', '方案号', 'VIN码', '样车配置'])
 
-# Write the DataFrame to an Excel file
-df.to_excel('output.xlsx', index=False)
+import spacy
+
+# Load the trained model
+nlp = spacy.load('model')
+
+
+# Function to extract engine and gearbox information
+def extract_info(text):
+    doc = nlp(text)
+    engine = None
+    gearbox = None
+    bridge = None
+    for ent in doc.ents:
+        if ent.label_ == '发动机平台':
+            engine = ent.text
+        elif ent.label_ == '变速箱':
+            gearbox = ent.text
+        elif ent.label_ == '桥':
+            bridge = ent.text
+
+    return engine, gearbox, bridge
+
+
+# Apply the function to each row in the DataFrame
+df[['发动机', '变速箱', '桥']] = df['样车配置'].apply(lambda x: pd.Series(extract_info(x)))
+
+# Write the updated DataFrame to an Excel file
+df.to_excel('output_with_engine_gearbox.xlsx', index=False)

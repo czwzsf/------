@@ -3,6 +3,7 @@ import spacy
 from spacy.util import minibatch, compounding
 from spacy.training.example import Example
 import random
+import re
 
 # Load a blank spaCy model for Chinese
 nlp = spacy.blank("zh")
@@ -24,16 +25,24 @@ train_data = []
 
 for _, row in df.iterrows():
     # Skip rows with NaN values
-    configuration = str(row['配置详情']) if pd.notna(row['配置详情']) else ""
+    configuration = str(row['配置详情']).strip() if pd.notna(row['配置详情']) else ""
     entities = []
     for category in categories:
-        value = str(row[category]) if pd.notna(row[category]) else ""
-        start_idx = configuration.find(value)
-        if start_idx != -1:
-            end_idx = start_idx + len(value)
+        value = str(row[category]).strip() if pd.notna(row[category]) else ""
+        # Use regular expression to find the value in the configuration
+        match = re.search(re.escape(value), configuration)
+        if match:
+            start_idx = match.start()
+            end_idx = match.end()
             entities.append((start_idx, end_idx, category))
+        else:
+            # Debugging: Print when a value is not found
+            print(f'Value "{value}" for category "{category}" not found in configuration: {configuration}')
     if entities:
         train_data.append((configuration, {"entities": entities}))
+    # Debugging: Print the entities for each row
+    print(f'Configuration: {configuration}')
+    print(f'Entities: {entities}')
 
 # Convert to spaCy's Example objects
 examples = []
@@ -44,7 +53,7 @@ for text, annotations in train_data:
 
 # Train the model
 nlp.begin_training()
-n_iter = 50
+n_iter = 100
 
 for i in range(n_iter):
     random.shuffle(examples)
