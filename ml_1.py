@@ -1,15 +1,18 @@
 import pandas as pd
 import spacy
+from scipy.ndimage import label
 from spacy.util import minibatch, compounding
 from spacy.training.example import Example
 import random
 import re
+import matplotlib.pyplot as plt
 
 # Load a blank spaCy model for Chinese
 nlp = spacy.blank("zh")
+all_losses = []
 
 # Create a new NER pipeline component and add it to the pipeline
-ner = nlp.add_pipe("ner", last=True)
+ner = nlp.add_pipe("ner", last=True)  # ner的意思是命名实体识别（Named Entity Recognition）
 
 # Read the Excel file
 file_path = 'result/整车试验信息.xlsx'
@@ -53,16 +56,17 @@ for text, annotations in train_data:
 
 # Train the model
 nlp.begin_training()
-n_iter = 100
+n_iter = 250
 
 for i in range(n_iter):
     random.shuffle(examples)
     losses = {}
     # Adjust the batch size here
-    batches = minibatch(examples, size=compounding(4.0, 256.0,
+    batches = minibatch(examples, size=compounding(4.0, 32.0,
                                                    1.00001))
     for batch in batches:
-        nlp.update(batch, drop=0.4, losses=losses)  # drop=0.5 作用是每次训练时，随机丢弃50%的数据，防止过拟合
+        nlp.update(batch, drop=0.5, losses=losses)  # drop=0.5 作用是每次训练时，随机丢弃50%的数据，防止过拟合
+    all_losses.append(losses['ner'])
     print(f'Losses at iteration {i}: {losses}')
 
 # Save the model
@@ -78,3 +82,10 @@ doc = nlp2(test_text)
 # Extract and print the recognized entities
 for ent in doc.ents:
     print(f'Label: {ent.label_}, Text: {ent.text}')
+
+plt.plot(range(n_iter), all_losses, label='Ner Loss')
+plt.xlabel('Iterations')
+plt.ylabel('Loss')
+plt.title('NER Training Loss Over Iterations')
+plt.legend()
+plt.show()
