@@ -1,5 +1,5 @@
 import pandas as pd
-import spacy
+import spacy  # 导入spacy库，作用是
 from scipy.ndimage import label
 from spacy.util import minibatch, compounding
 from spacy.training.example import Example
@@ -40,7 +40,8 @@ for _, row in df.iterrows():
             entities.append((start_idx, end_idx, category))
         else:
             # Debugging: Print when a value is not found
-            print(f'Value "{value}" for category "{category}" not found in configuration: {configuration}')
+            print(
+                f'Value "{value}" for category "{category}" not found in configuration: {configuration}')
     if entities:
         train_data.append((configuration, {"entities": entities}))
     # Debugging: Print the entities for each row
@@ -65,7 +66,8 @@ for i in range(n_iter):
     batches = minibatch(examples, size=compounding(4.0, 32.0,
                                                    1.00001))
     for batch in batches:
-        nlp.update(batch, drop=0.5, losses=losses)  # drop=0.5 作用是每次训练时，随机丢弃50%的数据，防止过拟合
+        # drop=0.5 作用是每次训练时，随机丢弃50%的数据，防止过拟合
+        nlp.update(batch, drop=0.5, losses=losses)
     all_losses.append(losses['ner'])
     print(f'Losses at iteration {i}: {losses}')
 
