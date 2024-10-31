@@ -1,3 +1,4 @@
+import spacy
 import os
 import re
 import pandas as pd
@@ -44,12 +45,12 @@ for filename in os.listdir(path):
                             config_details = row.cells[i + 1].text.strip()
             # Add the information to the list
             if vehicle_model and series and scheme_number and vin_code and config_details:
-                data.append([vehicle_model, series, scheme_number, vin_code, config_details])
+                data.append([vehicle_model, series, scheme_number,
+                            vin_code, config_details])
 
 # Convert the list to a DataFrame
 df = pd.DataFrame(data, columns=['车型', '品系', '方案号', 'VIN码', '样车配置'])
 
-import spacy
 
 # Load the trained model
 nlp = spacy.load('model')
@@ -73,7 +74,8 @@ def extract_info(text):
 
 
 # Apply the function to each row in the DataFrame
-df[['发动机', '变速箱', '桥']] = df['样车配置'].apply(lambda x: pd.Series(extract_info(x)))
+df[['发动机', '变速箱', '桥']] = df['样车配置'].apply(
+    lambda x: pd.Series(extract_info(x)))
 
 # Write the updated DataFrame to an Excel file
 df.to_excel('output_with_engine_gearbox.xlsx', index=False)

@@ -57,7 +57,7 @@ for text, annotations in train_data:
 
 # Train the model
 nlp.begin_training()
-n_iter = 250
+n_iter = 100  # 目前看来100次就可以了
 
 for i in range(n_iter):
     random.shuffle(examples)
