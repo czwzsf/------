@@ -5,7 +5,7 @@ import pandas as pd
 from docx import Document
 
 # File path
-path = 'data/Data_JH6'
+path = 'data/Data_2024_10'
 
 # Initialize an empty list to store file information
 data = []
@@ -43,39 +43,47 @@ for filename in os.listdir(path):
                             vin_code = row.cells[i + 1].text.strip()[-8:]
                         if '样车配置' in cell.text and i + 1 < len(row.cells):
                             config_details = row.cells[i + 1].text.strip()
+                        if '项目名称' in cell.text and i + 1 < len(row.cells):
+                            project_name = row.cells[i + 1].text.strip()
+                        if '试验理由' in cell.text and i + 1 < len(row.cells):
+                            test_reason = row.cells[i + 1].text.strip()
+                        if '试验方案' in cell.text and i + 1 < len(row.cells):
+                            test_plan = row.cells[i + 1].text.strip()
+                        if '试验时间' in cell.text and i + 1 < len(row.cells):
+                            test_time = row.cells[i + 1].text.strip()
             # Add the information to the list
             if vehicle_model and series and scheme_number and vin_code and config_details:
                 data.append([vehicle_model, series, scheme_number,
-                            vin_code, config_details])
+                            vin_code, config_details, project_name, test_reason, test_plan, test_time])
 
 # Convert the list to a DataFrame
-df = pd.DataFrame(data, columns=['车型', '品系', '方案号', 'VIN码', '样车配置'])
+df = pd.DataFrame(
+    data, columns=['车型', '品系', '方案号', 'VIN码', '样车配置', '项目名称', '试验理由', '试验方案', '试验时间'])
+
+# # Load the trained model
+# nlp = spacy.load('model')
 
 
-# Load the trained model
-nlp = spacy.load('model')
+# # Function to extract engine and gearbox information
+# def extract_info(text):
+#     doc = nlp(text)
+#     engine = None
+#     gearbox = None
+#     bridge = None
+#     for ent in doc.ents:
+#         if ent.label_ == '发动机平台':
+#             engine = ent.text
+#         elif ent.label_ == '变速箱':
+#             gearbox = ent.text
+#         elif ent.label_ == '桥':
+#             bridge = ent.text
+
+#     return engine, gearbox, bridge
 
 
-# Function to extract engine and gearbox information
-def extract_info(text):
-    doc = nlp(text)
-    engine = None
-    gearbox = None
-    bridge = None
-    for ent in doc.ents:
-        if ent.label_ == '发动机平台':
-            engine = ent.text
-        elif ent.label_ == '变速箱':
-            gearbox = ent.text
-        elif ent.label_ == '桥':
-            bridge = ent.text
-
-    return engine, gearbox, bridge
-
-
-# Apply the function to each row in the DataFrame
-df[['发动机', '变速箱', '桥']] = df['样车配置'].apply(
-    lambda x: pd.Series(extract_info(x)))
+# # Apply the function to each row in the DataFrame
+# df[['发动机', '变速箱', '桥']] = df['样车配置'].apply(
+#     lambda x: pd.Series(extract_info(x)))
 
 # Write the updated DataFrame to an Excel file
 df.to_excel('output_with_engine_gearbox.xlsx', index=False)
